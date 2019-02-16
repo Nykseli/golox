@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 // Value is value for constants
-type Value float64
+type Value float32
 
 // ValueArray holds values
 type ValueArray struct {

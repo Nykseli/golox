@@ -27,6 +27,16 @@ func (chunk *Chunk) DisassembleInstruction(offset int) int {
 	switch instruction {
 	case OpConstant:
 		return chunk.constantInstruction("OP_CONSTANT", offset)
+	case OpAdd:
+		return chunk.simpleInstruction("OP_ADD", offset)
+	case OpSubtract:
+		return chunk.simpleInstruction("OP_SUBTRACT", offset)
+	case OpMultiply:
+		return chunk.simpleInstruction("OP_MULTIPLY", offset)
+	case OpDivide:
+		return chunk.simpleInstruction("OP_DIVIDE", offset)
+	case OpNegate:
+		return chunk.simpleInstruction("OP_NEGATE", offset)
 	case OpReturn:
 		return chunk.simpleInstruction("OP_RETURN", offset)
 	default:
@@ -34,6 +44,17 @@ func (chunk *Chunk) DisassembleInstruction(offset int) int {
 		return offset + 1
 
 	}
+}
+
+// PrintHexes prints chunk instructions as hex array
+func (chunk *Chunk) PrintHexes(name string) {
+	fmt.Printf("== %s Hexes == \n", name)
+
+	for i := 0; i < chunk.Count; i++ {
+		fmt.Printf("0x%04x ", chunk.Code[i])
+	}
+
+	fmt.Printf("\n")
 }
 
 func (chunk *Chunk) constantInstruction(name string, offset int) int {

@@ -6,8 +6,18 @@ type OpCode uint8
 const (
 	// OpConstant is code for constant value
 	OpConstant uint8 = iota // 0
+	// OpAdd is add operand
+	OpAdd uint8 = iota
+	// OpSubtract is subtract operand
+	OpSubtract uint8 = iota
+	// OpMultiply is multiply operand
+	OpMultiply uint8 = iota
+	// OpDivide is divide operand
+	OpDivide uint8 = iota
+	// OpNegate is negate operand
+	OpNegate uint8 = iota
 	// OpReturn is code for return
-	OpReturn uint8 = iota // 1
+	OpReturn uint8 = iota
 )
 
 // Chunk contains the program code in bytecodes
