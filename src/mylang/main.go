@@ -1,33 +1,68 @@
 package main
 
+import (
+	"bufio"
+	"fmt"
+	"io/ioutil"
+	"os"
+)
+
+var vm = VM{}
+
+func repl() {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Printf("> ")
+
+		line, err := reader.ReadString('\n')
+
+		if err != nil || len(line) == 0 {
+			fmt.Printf("\n")
+			break
+		}
+
+		// reader.Readstring doesn't include the the EOF byte so we need to add it
+		line += string(FileEOF)
+
+		vm.Interpret(line)
+	}
+}
+
+func readFile(path string) string {
+	fileBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		os.Exit(74)
+	}
+
+	// reader.Readstring doesn't include the the EOF byte so we need to add it
+	sourceBytes := append(fileBytes, FileEOF)
+
+	return string(sourceBytes)
+}
+
+func runFile(path string) {
+	source := readFile(path)
+	result := vm.Interpret(source)
+
+	if result == InterpretCompileError {
+		os.Exit(65)
+	}
+	if result == InterpretRuntimeError {
+		os.Exit(70)
+	}
+}
+
 func main() {
 	// Initialize vm
-	vm := VM{}
 	vm.InitVM()
 
-	chunk := Chunk{}
-	chunk.InitChunk()
-
-	constant := chunk.AddConstant(1.2)
-	chunk.WriteChunk(OpConstant, 123)
-	chunk.WriteChunk(uint8(constant), 123)
-	chunk.WriteChunk(OpNegate, 123)
-
-	constant = chunk.AddConstant(3.4)
-	chunk.WriteChunk(OpConstant, 123)
-	chunk.WriteChunk(uint8(constant), 123)
-
-	chunk.WriteChunk(OpAdd, 123)
-
-	constant = chunk.AddConstant(5.6)
-	chunk.WriteChunk(OpConstant, 123)
-	chunk.WriteChunk(uint8(constant), 123)
-
-	chunk.WriteChunk(OpDivide, 123)
-
-	chunk.WriteChunk(OpReturn, 123)
-	chunk.PrintHexes("Test Chunk")
-	chunk.DisassembleChunk("Test Chunk")
-	vm.Interpret(chunk)
-
+	if len(os.Args) == 1 {
+		repl()
+	} else if len(os.Args) == 2 {
+		runFile(os.Args[1])
+	} else {
+		fmt.Fprintf(os.Stderr, "Usage: mylang [path]\n")
+		os.Exit(64)
+	}
 }

@@ -121,9 +121,12 @@ func (vm *VM) run() int {
 }
 
 // Interpret chunk
-func (vm *VM) Interpret(chunk Chunk) int {
-	vm.Chunk = chunk
-	vm.IP = 0
-	vm.IPArr = vm.Chunk.Code
-	return vm.run()
+func (vm *VM) Interpret(source string) int {
+
+	// vm.Chunk = chunk
+	// vm.IP = 0
+	// vm.IPArr = vm.Chunk.Code
+	// return vm.run()
+	Compile(source)
+	return InterpretOk
 }
