@@ -1,2 +1,12 @@
 /mylang
 /testfile.txt
+
+# glox compiler
+/gloxc
+# glox virtual machine
+/gloxvm
+# glox runner
+/gloxrun
+
+# compiler outputfile
+/out.glb

@@ -147,9 +147,9 @@ func emitConstant(value Value) {
 
 func endCompiler() {
 	emitReturn()
-	if DebugPrintCode && !parser.HadError {
-		currentChunk().DisassembleChunk("code")
-	}
+	// if DebugPrintCode && !parser.HadError {
+	// 	currentChunk().DisassembleChunk("code")
+	// }
 }
 
 func parseBinary() {

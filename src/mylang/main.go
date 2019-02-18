@@ -43,7 +43,7 @@ func readFile(path string) string {
 		os.Exit(74)
 	}
 
-	// reader.Readstring doesn't include the the EOF byte so we need to add it
+	// ioutil.ReadFile doesn't include the the EOF byte so we need to add it
 	sourceBytes := append(fileBytes, FileEOF)
 
 	return string(sourceBytes)
@@ -70,7 +70,7 @@ func main() {
 	} else if len(os.Args) == 2 {
 		runFile(os.Args[1])
 	} else {
-		fmt.Fprintf(os.Stderr, "Usage: mylang [path]\n")
+		fmt.Fprintf(os.Stderr, "Usage: gloxrun [path]\n")
 		os.Exit(64)
 	}
 }

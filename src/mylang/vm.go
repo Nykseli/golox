@@ -118,7 +118,15 @@ func (vm *VM) run() int {
 	}
 }
 
-// Interpret chunk
+// InterpretBytes feeds the chunk that we get from glb file
+func (vm *VM) InterpretBytes(chunk Chunk) int {
+	vm.Chunk = chunk
+	vm.IP = 0
+	vm.IPArr = vm.Chunk.Code
+	return vm.run()
+}
+
+// Interpret from source string
 func (vm *VM) Interpret(source string) int {
 	var chunk = Chunk{}
 	chunk.InitChunk()
