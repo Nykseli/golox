@@ -90,8 +90,6 @@ func (vm *VM) run() int {
 			{
 				constant := vm.readConstant()
 				vm.Push(constant)
-				PrintValue(constant)
-				fmt.Printf("\n")
 				break
 			}
 		case OpAdd:
@@ -122,11 +120,14 @@ func (vm *VM) run() int {
 
 // Interpret chunk
 func (vm *VM) Interpret(source string) int {
+	var chunk = Chunk{}
+	chunk.InitChunk()
+	if !Compile(source, &chunk) {
+		return InterpretCompileError
+	}
 
-	// vm.Chunk = chunk
-	// vm.IP = 0
-	// vm.IPArr = vm.Chunk.Code
-	// return vm.run()
-	Compile(source)
-	return InterpretOk
+	vm.Chunk = chunk
+	vm.IP = 0
+	vm.IPArr = vm.Chunk.Code
+	return vm.run()
 }

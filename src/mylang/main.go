@@ -1,3 +1,8 @@
+// +build gloxrun,!gloxvm,!gloxcompiler
+
+// main file for building runner
+// runner parses the source code to bytecode and feeds
+
 package main
 
 import (
@@ -6,6 +11,9 @@ import (
 	"io/ioutil"
 	"os"
 )
+
+// DebugPrintCode if true, prints dissasembled chunk from compiler
+var DebugPrintCode = true
 
 var vm = VM{}
 

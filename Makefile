@@ -1,7 +1,13 @@
 
 
 all:
-	go build mylang
+	go build -tags gloxrun mylang
+
+compiler:
+	go build -tags gloxcompiler mylang
+
+vm:
+	go build -tags gloxvm mylang
 
 debug:
 	go build -gcflags=all="-N -l" mylang
