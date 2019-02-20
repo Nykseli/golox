@@ -16,9 +16,6 @@ import (
 
 var vm = VM{}
 
-// DebugPrintCode if true, prints dissasembled chunk from compiler
-var DebugPrintCode = true
-
 // readFile into []byte
 func readFile(path string) []byte {
 	fileBytes, err := ioutil.ReadFile(path)
@@ -52,7 +49,7 @@ func runFile(path string) {
 
 }
 
-func main() {
+func mainTarget() {
 	// Initialize vm
 	vm.InitVM()
 

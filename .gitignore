@@ -10,3 +10,6 @@
 
 # compiler outputfile
 /out.glb
+
+# Visual Studio Code
+.vscode

@@ -15,9 +15,6 @@ import (
 	"os"
 )
 
-// DebugPrintCode if true, prints dissasembled chunk from compiler
-var DebugPrintCode = true
-
 // DefaultFileMod defines in what mode the compiled file will be by default
 var DefaultFileMod os.FileMode = 0644
 
@@ -67,7 +64,7 @@ func runFile(path string) {
 
 }
 
-func main() {
+func mainTarget() {
 	// Initialize vm
 	vm.InitVM()
 
