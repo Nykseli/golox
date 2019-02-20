@@ -59,6 +59,9 @@ func runFile(path string) {
 }
 
 func mainTarget() {
+	// Register Value structs so they can be encoded to binary file
+	RegisterValues()
+
 	// Initialize vm
 	vm.InitVM()
 

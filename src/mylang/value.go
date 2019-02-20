@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"encoding/gob"
+	"fmt"
+)
 
 // ValueType defines how the Value is handeled
 type ValueType uint8
@@ -33,6 +36,15 @@ type NumberValue struct {
 type Value struct {
 	Type ValueType
 	As   interface{}
+}
+
+// RegisterValues registers Value structs to gob so they can be endocded/decoded
+// This is used by compiler and vm. Runner doesn't need to register these
+func RegisterValues() {
+	gob.Register(BoolValue{})
+	gob.Register(NilValue{})
+	gob.Register(NumberValue{})
+	gob.Register(Value{})
 }
 
 // IsBool checks if the value type is ValBool
