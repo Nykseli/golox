@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
+
+// RunTimeError tells if vm has encountered an error
+var RunTimeError = false
 
 // StackMax defines the maximum size of the VM stack
 const StackMax = 256
@@ -29,6 +35,15 @@ func (vm *VM) resetStack() {
 	vm.StackTop = vm.Stack[vm.StackPos]
 }
 
+func runTimeError(format string, args ...string) {
+	fmt.Fprintf(os.Stderr, format)
+	fmt.Fprintf(os.Stderr, "\n")
+
+	fmt.Fprintf(os.Stderr, "[line %d] in script\n",
+		vm.Chunk.Lines[vm.IP])
+
+}
+
 // InitVM initializes the virtual mashine
 func (vm *VM) InitVM() {
 	vm.resetStack()
@@ -51,6 +66,14 @@ func (vm *VM) Pop() Value {
 	return vm.Stack[vm.StackPos]
 }
 
+func (vm *VM) peekStack(distance int) Value {
+	return vm.Stack[vm.StackPos-1-distance]
+}
+
+func isFalsey(value Value) bool {
+	return IsNil(value) || (IsBool(value) && !AsBool(value))
+}
+
 func (vm *VM) readByte() uint8 {
 	val := vm.IPArr[vm.IP]
 	vm.IP++
@@ -58,21 +81,34 @@ func (vm *VM) readByte() uint8 {
 }
 
 func (vm *VM) binaryOp(op uint8) {
-	b := vm.Pop()
-	a := vm.Pop()
+
+	if !IsNumber(vm.peekStack(0)) || !IsNumber(vm.peekStack(1)) {
+		runTimeError("Operands must be numbers.")
+		RunTimeError = true
+		return
+	}
+
+	b := AsNumber(vm.Pop())
+	a := AsNumber(vm.Pop())
 
 	switch op {
+	case '<':
+		vm.Push(BoolVal(a < b))
+		break
+	case '>':
+		vm.Push(BoolVal(a > b))
+		break
 	case '+':
-		vm.Push(a + b)
+		vm.Push(NumberVal(a + b))
 		break
 	case '-':
-		vm.Push(a - b)
+		vm.Push(NumberVal(a - b))
 		break
 	case '*':
-		vm.Push(a * b)
+		vm.Push(NumberVal(a * b))
 		break
 	case '/':
-		vm.Push(a / b)
+		vm.Push(NumberVal(a / b))
 		break
 	}
 }
@@ -84,6 +120,17 @@ func (vm *VM) readConstant() Value {
 // run is where the actual bytecode is executed
 func (vm *VM) run() int {
 	for {
+		fmt.Printf("          ")
+		for i := 0; i < int(vm.StackPos); i++ {
+			if vm.Stack[i].As != nil {
+				fmt.Printf("[ ")
+				PrintValue(vm.Stack[i])
+				fmt.Printf(" ]")
+			}
+		}
+		fmt.Printf("\n")
+		vm.Chunk.DisassembleInstruction(int(vm.IP))
+
 		instruction := vm.readByte()
 		switch instruction {
 		case OpConstant:
@@ -92,6 +139,28 @@ func (vm *VM) run() int {
 				vm.Push(constant)
 				break
 			}
+		case OpNil:
+			vm.Push(NilVal())
+			break
+		case OpTrue:
+			vm.Push(BoolVal(true))
+			break
+		case OpFalse:
+			vm.Push(BoolVal(false))
+			break
+		case OpEqual:
+			{
+				b := vm.Pop()
+				a := vm.Pop()
+				vm.Push(BoolVal(ValuesEqual(a, b)))
+				break
+			}
+		case OpGreater:
+			vm.binaryOp('>')
+			break
+		case OpLess:
+			vm.binaryOp('<')
+			break
 		case OpAdd:
 			vm.binaryOp('+')
 			break
@@ -104,8 +173,14 @@ func (vm *VM) run() int {
 		case OpDivide:
 			vm.binaryOp('/')
 			break
+		case OpNot:
+			vm.Push(BoolVal(isFalsey(vm.Pop())))
 		case OpNegate:
-			vm.Push(-vm.Pop())
+			if !IsNumber(vm.peekStack(0)) {
+				runTimeError("Operand must be a number.")
+				RunTimeError = true
+			}
+			vm.Push(NumberVal(-AsNumber(vm.Pop())))
 			break
 		case OpReturn:
 			PrintValue(vm.Pop())
@@ -114,6 +189,10 @@ func (vm *VM) run() int {
 		default:
 			break
 
+		}
+
+		if RunTimeError {
+			return InterpretRuntimeError
 		}
 	}
 }

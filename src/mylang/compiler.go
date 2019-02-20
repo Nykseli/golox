@@ -147,9 +147,9 @@ func emitConstant(value Value) {
 
 func endCompiler() {
 	emitReturn()
-	// if DebugPrintCode && !parser.HadError {
-	// 	currentChunk().DisassembleChunk("code")
-	// }
+	if DebugPrintCode && !parser.HadError {
+		currentChunk().DisassembleChunk("code")
+	}
 }
 
 func parseBinary() {
@@ -162,6 +162,24 @@ func parseBinary() {
 
 	// Emit the operator instruction
 	switch operatorType {
+	case TokenBangEqual:
+		emitBytes(OpEqual, OpNot)
+		break
+	case TokenEqualEqual:
+		emitByte(OpEqual)
+		break
+	case TokenGreater:
+		emitByte(OpGreater)
+		break
+	case TokenGreaterEqual:
+		emitBytes(OpLess, OpNot)
+		break
+	case TokenLess:
+		emitByte(OpLess)
+		break
+	case TokenLessEqual:
+		emitBytes(OpGreater, OpNot)
+		break
 	case TokenPlus:
 		emitByte(OpAdd)
 		break
@@ -179,6 +197,22 @@ func parseBinary() {
 	}
 }
 
+func parseLiteral() {
+	switch parser.Previous.Type {
+	case TokenFalse:
+		emitByte(OpFalse)
+		break
+	case TokenNil:
+		emitByte(OpNil)
+		break
+	case TokenTrue:
+		emitByte(OpTrue)
+		break
+	default:
+		return // Unreachable
+	}
+}
+
 func parseExpression() {
 	parsePrecedence(PrecAssignment)
 }
@@ -190,7 +224,7 @@ func parseGrouping() {
 
 func parseNumber() {
 	value, _ := strconv.ParseFloat(parser.Previous.Value, 64)
-	val := Value(value)
+	val := NumberVal(value)
 	emitConstant(val)
 }
 
@@ -201,6 +235,9 @@ func parseUnary() {
 	parsePrecedence(PrecUnary)
 
 	switch operatorType {
+	case TokenBang:
+		emitByte(OpNot)
+		break
 	case TokenMinus:
 		emitByte(OpNegate)
 		break
@@ -247,31 +284,31 @@ func initCompiler() {
 		{nil, nil, PrecNone},                // TokenSemicolon
 		{nil, parseBinary, PrecFactor},      // TokenSlash
 		{nil, parseBinary, PrecFactor},      // TokenStar
-		{nil, nil, PrecNone},                // TokenBang
-		{nil, nil, PrecEquality},            // TokenBangEqual
+		{parseUnary, nil, PrecNone},         // TokenBang
+		{nil, parseBinary, PrecEquality},    // TokenBangEqual
 		{nil, nil, PrecNone},                // TokenEqual
-		{nil, nil, PrecEquality},            // TokenEqualEqual
-		{nil, nil, PrecComparison},          // TokenGreater
-		{nil, nil, PrecComparison},          // TokenGreaterEqual
-		{nil, nil, PrecComparison},          // TokenLess
-		{nil, nil, PrecComparison},          // TokenLessEqual
+		{nil, parseBinary, PrecEquality},    // TokenEqualEqual
+		{nil, parseBinary, PrecComparison},  // TokenGreater
+		{nil, parseBinary, PrecComparison},  // TokenGreaterEqual
+		{nil, parseBinary, PrecComparison},  // TokenLess
+		{nil, parseBinary, PrecComparison},  // TokenLessEqual
 		{nil, nil, PrecNone},                // TokenIdentifier
 		{nil, nil, PrecNone},                // TokenString
 		{parseNumber, nil, PrecNone},        // TokenNumber
 		{nil, nil, PrecAnd},                 // TokenAnd
 		{nil, nil, PrecNone},                // TokenClass
 		{nil, nil, PrecNone},                // TokenElse
-		{nil, nil, PrecNone},                // TokenFalse
+		{parseLiteral, nil, PrecNone},       // TokenFalse
 		{nil, nil, PrecNone},                // TokenFor
 		{nil, nil, PrecNone},                // TokenFun
 		{nil, nil, PrecNone},                // TokenIf
-		{nil, nil, PrecNone},                // TokenNil
+		{parseLiteral, nil, PrecNone},       // TokenNil
 		{nil, nil, PrecNone},                // TokenOr
 		{nil, nil, PrecNone},                // TokenPrint
 		{nil, nil, PrecNone},                // TokenReturn
 		{nil, nil, PrecNone},                // TokenSuper
 		{nil, nil, PrecNone},                // TokenThis
-		{nil, nil, PrecNone},                // TokenTrue
+		{parseLiteral, nil, PrecNone},       // TokenTrue
 		{nil, nil, PrecNone},                // TokenVar
 		{nil, nil, PrecNone},                // TokenWhile
 		{nil, nil, PrecNone},                // TokenError

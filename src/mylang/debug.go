@@ -27,6 +27,18 @@ func (chunk *Chunk) DisassembleInstruction(offset int) int {
 	switch instruction {
 	case OpConstant:
 		return chunk.constantInstruction("OP_CONSTANT", offset)
+	case OpNil:
+		return chunk.simpleInstruction("OP_NIL", offset)
+	case OpTrue:
+		return chunk.simpleInstruction("OP_TRUE", offset)
+	case OpFalse:
+		return chunk.simpleInstruction("OP_FALSE", offset)
+	case OpEqual:
+		return chunk.simpleInstruction("OP_EQUAL", offset)
+	case OpGreater:
+		return chunk.simpleInstruction("OP_GREATER", offset)
+	case OpLess:
+		return chunk.simpleInstruction("OP_LESS", offset)
 	case OpAdd:
 		return chunk.simpleInstruction("OP_ADD", offset)
 	case OpSubtract:
@@ -35,12 +47,14 @@ func (chunk *Chunk) DisassembleInstruction(offset int) int {
 		return chunk.simpleInstruction("OP_MULTIPLY", offset)
 	case OpDivide:
 		return chunk.simpleInstruction("OP_DIVIDE", offset)
+	case OpNot:
+		return chunk.simpleInstruction("OP_NOT", offset)
 	case OpNegate:
 		return chunk.simpleInstruction("OP_NEGATE", offset)
 	case OpReturn:
 		return chunk.simpleInstruction("OP_RETURN", offset)
 	default:
-		fmt.Printf("Unknown upcode %d\n", instruction)
+		fmt.Printf("Unknown opcode %d\n", instruction)
 		return offset + 1
 
 	}

@@ -6,6 +6,18 @@ type OpCode uint8
 const (
 	// OpConstant is code for constant value
 	OpConstant uint8 = iota // 0
+	// OpNil is code for nil constant
+	OpNil uint8 = iota
+	// OpTrue is code for true constant
+	OpTrue uint8 = iota
+	// OpFalse is code for false constant
+	OpFalse uint8 = iota
+	// OpEqual is for =
+	OpEqual uint8 = iota
+	// OpGreater is for >
+	OpGreater uint8 = iota
+	// OpLess is for <
+	OpLess uint8 = iota
 	// OpAdd is add operand
 	OpAdd uint8 = iota
 	// OpSubtract is subtract operand
@@ -14,6 +26,8 @@ const (
 	OpMultiply uint8 = iota
 	// OpDivide is divide operand
 	OpDivide uint8 = iota
+	// OpNot is code for ! (boolean thing)
+	OpNot uint8 = iota
 	// OpNegate is negate operand
 	OpNegate uint8 = iota
 	// OpReturn is code for return

@@ -16,12 +16,11 @@ vm:
 	mv mylang gloxvm
 
 debug:
-	go build -gcflags=all="-N -l" mylang
+	go build -gcflags=all="-N -l" -tags gloxrun mylang
 
 run-all:
 	go build mylang
 	./mylang
 
-run-debug:
-	go build -gcflags=all="-N -l" mylang
+run-debug: debug
 	gdb mylang
